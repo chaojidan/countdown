@@ -69,6 +69,7 @@
             }
             if (utils.isValidDate(standardTime)) {
                 this.diffTime = standardTime.getTime() - new Date().getTime();
+                this.diffTime = Math.floor(this.diffTime / 1000) * 1000;
                 //console.log('diffTime:' + this.diffTime);
             } else {
                 throw new Error('Countdown : Invalid Date of "options.timestamp"');
