@@ -1,8 +1,8 @@
 /**
  * Created with JetBrains PhpStorm.
  * User: wanghui
- * Date: 13-8-2
- * Time: 下午2:53
+ * Date: 13-8-4
+ * Time: 下午10:38
  * To change this template use File | Settings | File Templates.
  */
 (function(global, undefined) {
@@ -30,14 +30,23 @@
 
     Countdown.fn.start = function() {
         var self = this;
-        self.timer = setInterval(function() {
+        if (self.timer === 0) {
             self._countdown();
-        }, self.interval);
+            self.timer = setInterval(function() {
+                self._countdown();
+            }, self.interval);
+        }
     };
 
     Countdown.fn.stop = function() {
         var self = this;
         clearInterval(self.timer);
+        self.timer = 0;
+    };
+
+    Countdown.fn.end = function() {
+        var self = this;
+        self.stop();
         if (typeof self.endCallback === 'function') {
             self.endCallback();
         }
@@ -72,7 +81,7 @@
                 this.diffTime = Math.floor(this.diffTime / 1000) * 1000;
                 //console.log('diffTime:' + this.diffTime);
             } else {
-                throw new Error('Countdown : Invalid Date of "options.timestamp"');
+                throw new Error('Countdown : Invalid Date of "options.standardTime"');
             }
         }
     };
@@ -90,10 +99,9 @@
                 self.intervalCallback(strLeftTime, leftTime);
             }
         } else {
-            self.stop();
+            self.end();
         }
     };
-
 
     var utils = {
         getStrLeftTime : function(leftTime) {
@@ -129,5 +137,5 @@
         }
     };
 
-    global.Countdown = Countdown;
+    global.MfwCountdown = Countdown;
 })(this);
