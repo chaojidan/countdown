@@ -22,6 +22,7 @@
     Countdown.fn.init = function(options) {
         this.interval = parseInt(options.interval, 10) > 0 ? parseInt(options.interval, 10) : 1000;
         this.timer = 0;
+        this._getStandardTime(options.standardTime);
         this._getDiffTime(options.standardTime);
         this._getTargetTime(options.targetTime);
         this.intervalCallback = options.intervalCallback;
@@ -54,12 +55,13 @@
 
     Countdown.fn._getTargetTime = function(_targetTime) {
         if (_targetTime instanceof Date) {
-            this.targetTime = options.targetTime;
+            this.targetTime = _targetTime;
         } else {
             this.targetTime = new Date(_targetTime);
         }
         if (utils.isValidDate(this.targetTime)) {
-            if (this.targetTime < new Date().getTime()) {
+            var standardTime = this.standardTime !== undefined ? this.standardTime : new Date();
+            if (this.targetTime < standardTime.getTime()) {
                 throw new Error('Countdown : Target time can not be less than the current time');
             }
         } else {
@@ -67,22 +69,24 @@
         }
     };
 
-    Countdown.fn._getDiffTime = function(_standardTime) {
-        this.diffTime = 0;
+    Countdown.fn._getStandardTime = function(_standardTime) {
         if (_standardTime !== undefined) {
-            var standardTime;
             if (_standardTime instanceof Date) {
-                standardTime = _standardTime;
+                this.standardTime = _standardTime;
             } else {
-                standardTime = new Date(_standardTime);
+                this.standardTime = new Date(_standardTime);
             }
-            if (utils.isValidDate(standardTime)) {
-                this.diffTime = standardTime.getTime() - new Date().getTime();
-                this.diffTime = Math.floor(this.diffTime / 1000) * 1000;
-                //console.log('diffTime:' + this.diffTime);
-            } else {
+            if (!utils.isValidDate(this.standardTime)) {
                 throw new Error('Countdown : Invalid Date of "options.standardTime"');
             }
+        }
+    };
+
+    Countdown.fn._getDiffTime = function() {
+        this.diffTime = 0;
+        if (this.standardTime !== undefined) {
+            this.diffTime = this.standardTime.getTime() - new Date().getTime();
+            this.diffTime = Math.floor(this.diffTime / 1000) * 1000;
         }
     };
 
